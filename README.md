@@ -7,11 +7,11 @@
 ---
 
 ```
-composer require protein/structure
+composer require proteins/structure
 ```
 
 Require the class via :
 
 ```php
-use Protein\Structure;
+use Proteins\Structure;
 ```
