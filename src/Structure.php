@@ -24,11 +24,11 @@ class Structure extends \ArrayObject {
      */
     public function __construct($input=[], $deep=true)
     {
-        $data = is_string($input) ? json_decode($input, true) : (array)$input;
-        if (is_array($data)) {
+        $data = \is_string($input) ? \json_decode($input, true) : (array)$input;
+        if (\is_array($data)) {
             if ($deep) {
                 foreach ($data as $key => &$value) {
-                    if (is_array($value) || is_a($value, 'stdClass')) {
+                    if (\is_array($value) || \is_a($value, 'stdClass')) {
                         $value = new self($value);
                     }
                 }
@@ -47,7 +47,7 @@ class Structure extends \ArrayObject {
      * @return void
      */
     public function offsetSet($key, $value) {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             parent::offsetSet($key, new static($value));
         } else {
             parent::offsetSet($key, $value);
@@ -59,7 +59,7 @@ class Structure extends \ArrayObject {
      */
     public function offsetGet($key) {
         $raw = parent::offsetGet($key);
-        return is_callable($raw) ? call_user_func($raw) : $raw;
+        return \is_callable($raw) ? \call_user_func($raw) : $raw;
     }
 
     /**
@@ -67,11 +67,11 @@ class Structure extends \ArrayObject {
      */
     public function __call($method, $args) {
         $raw = parent::offsetGet($method);
-        if (is_callable($raw)) {
+        if (\is_callable($raw)) {
             if ($raw instanceof \Closure) {
                 $raw->bindTo($this);
             }
-            return call_user_func_array($raw, $args);
+            return \call_user_func_array($raw, $args);
         }
     }
 
@@ -80,7 +80,7 @@ class Structure extends \ArrayObject {
      * @return string
      */
     public function __toString() {
-        return json_encode($this, JSON_NUMERIC_CHECK);
+        return \json_encode($this, JSON_NUMERIC_CHECK);
     }
 
     /**
@@ -92,10 +92,10 @@ class Structure extends \ArrayObject {
 
     public static function fetch($path, $root) {
         $_ = (array)$root;
-        if (strpos($path, '.') === false) {
+        if (\strpos($path, '.') === false) {
             return isset($_[$path]) ? $_[$path] : null;
         } else {
-            list($frag, $rest) = explode('.', $path, 2);
+            list($frag, $rest) = \explode('.', $path, 2);
             if ($rest) {
                 return isset($_[$frag]) ? self::fetch($rest, $_[$frag]) : null;
             } elseif ($frag) {
@@ -107,13 +107,13 @@ class Structure extends \ArrayObject {
     }
 
     public static function create($class, $args = null) : self {
-        return is_array($args) ? (new \ReflectionClass($class))->newInstanceArgs($args) : new $class;
+        return \is_array($args) ? (new \ReflectionClass($class))->newInstanceArgs($args) : new $class;
     }
 
     /**
      * @return bool
      */
     public static function canBeString($var) : bool {
-        return $var === null || is_scalar($var) || is_callable([$var, '__toString']);
+        return $var === null || \is_scalar($var) || \is_callable([$var, '__toString']);
     }
 }
